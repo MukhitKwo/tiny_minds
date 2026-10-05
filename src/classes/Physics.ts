@@ -1,4 +1,4 @@
-class Vector2 {
+export class Vector2 {
 	x: number;
 	y: number;
 
@@ -37,13 +37,14 @@ class Vector2 {
 	}
 }
 
-class Circle {
+export class CirclePhysics {
 	position: Vector2;
 	radius: number;
 	velocity: Vector2;
 	mass: number;
 	bounce: number;
-	invMass = 1;
+	invMass: number = 1;
+	decay: number = 0.99
 
 	// Ball A (cart) has mass = 1. Ball B (truck) has mass = 9. Overlap is 10 pixels.
 	// Cart (A): invMass = 1 / 1 = 1.0
@@ -55,8 +56,8 @@ class Circle {
 	// 10 * (0.111 / 1.111) = 1px forward
 
 	constructor(
-		x: number = 0,
-		y: number = 0,
+		x: number,
+		y: number,
 		radius: number = 1,
 		mass: number = 1,
 		velocity: Vector2 = new Vector2(0, 0),
@@ -73,7 +74,15 @@ class Circle {
 		// If invMass is 0, it's an immovable wall/bumper
 		if (this.invMass === 0) return;
 
-		// pos = pos + vel * dt
+		const frictionFactor = Math.exp(-this.decay * dt);
+		this.velocity = this.velocity.scale(frictionFactor);
+
+		// Optional: Stop tiny micro-jitters when velocity is virtually zero
+		if (this.velocity.magSq() < 0.01) {
+			this.velocity = new Vector2(Math.random() * 1000 - 50, Math.random() * 1000 - 50);
+		}
+
+		// 2. Move position
 		this.position = this.position.add(this.velocity.scale(dt));
 	}
 }

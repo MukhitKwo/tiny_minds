@@ -1,5 +1,7 @@
+import { CircleGraphic } from './classes/CircleGraphic'
+import { Vector2 } from './classes/Physics'
 import './style.css'
-import { Application, Graphics } from 'pixi.js'
+import { Application } from 'pixi.js'
 
 const app = new Application()
 await app.init({
@@ -12,16 +14,13 @@ await app.init({
 document.body.appendChild(app.canvas)
 
 // Visuals
-const ballGfx = new Graphics().circle(400, 0, 20).fill(0x89b4fa)
-const groundGfx = new Graphics().rect(-400, -20, 800, 40).fill(0xa6e3a1)
-groundGfx.position.set(400, 580)
-app.stage.addChild(ballGfx, groundGfx)
+const ball = new CircleGraphic(app, 100, 100, 20)
 
-function loop() {
-  // Update the ball's position
-  ballGfx.y += 1 * app.ticker.deltaMS
-}
+ball.velocity = new Vector2(1000, 0)
 
-// simulation loop
-app.ticker.add(loop);
-
+app.ticker.add((ticker) => {
+  // If your physics velocity is in units per second:
+  const dtInSeconds = ticker.deltaMS / 1000;
+  ball.update(dtInSeconds);
+  ball.draw();
+});
