@@ -1,26 +1,41 @@
-import { CircleGraphic } from './classes/CircleGraphic'
-import { Vector2 } from './classes/Physics'
-import './style.css'
-import { Application } from 'pixi.js'
+import { CircleGraphic, SquareGraphic } from "./classes/graphics/ShapeGraphic";
+import { Vector2 } from "./classes/physics/Vector2";
+import "./style.css";
+import { Application } from "pixi.js";
+import { resolveCircles } from "./utils/collisions";
 
-const app = new Application()
+const app = new Application();
 await app.init({
-  resizeTo: window,
-  background: '#1e1e2e',
-  antialias: true,
-  resolution: window.devicePixelRatio,
-  autoDensity: true,
-})
-document.body.appendChild(app.canvas)
+	resizeTo: window,
+	background: "#1e1e2e",
+	antialias: true,
+	resolution: window.devicePixelRatio,
+	autoDensity: true,
+});
+document.body.appendChild(app.canvas);
 
-// Visuals
-const ball = new CircleGraphic(app, 100, 100, 20)
+const ball1 = new CircleGraphic(app, 100, 400, 20);
+const ball2 = new CircleGraphic(app, 500, 405, 20);
 
-ball.velocity = new Vector2(1000, 0)
+const wall1 = new SquareGraphic(app, 0, 0, 10, app.screen.height);
+const wall2 = new SquareGraphic(app, 0, 0, app.screen.width, 10);
+const wall3 = new SquareGraphic(app, app.screen.width - 10, 0, 20, app.screen.height);
+const wall4 = new SquareGraphic(app, 0, app.screen.height - 10, app.screen.width, 20);
+
+ball1.velocity = new Vector2(1000, 0);
 
 app.ticker.add((ticker) => {
-  // If your physics velocity is in units per second:
-  const dtInSeconds = ticker.deltaMS / 1000;
-  ball.update(dtInSeconds);
-  ball.draw();
+	// If your physics velocity is in units per second:
+	const dtInSeconds = ticker.deltaMS / 1000;
+	ball1.update(dtInSeconds);
+	ball2.update(dtInSeconds);
+	ball1.draw();
+	ball2.draw();
+
+	wall1.draw();
+	wall2.draw();
+	wall3.draw();
+	wall4.draw();
+
+	resolveCircles(ball1, ball2);
 });
