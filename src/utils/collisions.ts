@@ -1,4 +1,4 @@
-import type { CirclePhysics } from "../classes/physics/ShapePhysics";
+import type { CirclePhysics } from "../classes/ShapePhysics";
 
 export function resolveCircles(a: CirclePhysics, b: CirclePhysics) {
 	const dx = b.position.x - a.position.x;

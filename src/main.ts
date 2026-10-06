@@ -1,5 +1,5 @@
-import { CircleGraphic, SquareGraphic } from "./classes/graphics/ShapeGraphic";
-import { Vector2 } from "./classes/physics/Vector2";
+import { CircleGraphic, SquareGraphic } from "./classes/ShapeGraphic";
+import { Vector2 } from "./classes/Vector2";
 import "./style.css";
 import { Application } from "pixi.js";
 import { resolveCircles } from "./utils/collisions";

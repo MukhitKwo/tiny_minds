@@ -1,5 +1,5 @@
 import { Application, Graphics } from 'pixi.js'
-import { CirclePhysics, SquarePhysics } from '../physics/ShapePhysics';
+import { CirclePhysics, SquarePhysics } from './ShapePhysics';
 
 export class CircleGraphic extends CirclePhysics {
     gfx = new Graphics().circle(0, 0, 20).fill(0xE63946)
