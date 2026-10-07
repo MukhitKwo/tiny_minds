@@ -1,5 +1,37 @@
 import type { CirclePhysics } from "../classes/ShapePhysics";
 
+export function resolveColision(a: CirclePhysics, b: CirclePhysics) {
+	const dx = b.position.x - a.position.x;
+	const dy = b.position.y - a.position.y;
+
+	const dist = Math.hypot(dx, dy) + 1e-8; //TODO use Vector2 method
+
+	const minDist = a.radius + b.radius;
+
+	if (dist > minDist) {
+		return;
+	}
+
+	const overlap = minDist - dist;
+
+	const totalInv = a.invMass + b.invMass;
+
+	if (totalInv === 0) {
+		return;
+	}
+
+	const nx = dx / dist;
+	const ny = dy / dist;
+
+	// 1. separate
+	a.position.x -= nx * overlap * (a.invMass / totalInv);
+	a.position.y -= ny * overlap * (a.invMass / totalInv);
+	b.position.x += nx * overlap * (b.invMass / totalInv);
+	b.position.y += ny * overlap * (b.invMass / totalInv);
+
+	return {nx, ny};
+}
+
 export function resolveCircles(a: CirclePhysics, b: CirclePhysics) {
 	const dx = b.position.x - a.position.x;
 	const dy = b.position.y - a.position.y;
