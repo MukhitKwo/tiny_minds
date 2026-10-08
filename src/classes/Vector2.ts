@@ -20,7 +20,7 @@ export class Vector2 {
 	}
 
 	magSq(): number {
-		return this.x * this.x + this.y * this.y;
+		return this.x ** 2 + this.y ** 2;
 	}
 
 	mag(): number {
