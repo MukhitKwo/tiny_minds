@@ -1,8 +1,8 @@
 import { CircleGraphic, SquareGraphic } from "./classes/ShapeGraphic";
 import { Vector2 } from "./classes/Vector2";
 import "./style.css";
-import { Application } from "pixi.js";
-import { resolveCircleCircleCollision, resolveCircleSquareColision } from "./utils/collisions";
+import { collideWorldBounds, resolveCircleCircleCollision } from "./utils/collisions";
+import { Application, Graphics, ParticleContainer } from "pixi.js";
 
 const app = new Application();
 await app.init({
@@ -12,18 +12,27 @@ await app.init({
 	resolution: window.devicePixelRatio,
 	autoDensity: true,
 });
+
 document.body.appendChild(app.canvas);
 
-const cellSize = 3; //TODO make dynamic
+const circleTex = app.renderer.generateTexture(
+	new Graphics().circle(0, 0, 32 / 2).fill(0xffffff), // white, so tint works
+);
+
+const container = new ParticleContainer({
+	dynamicProperties: { position: true, vertex: true, color: true },
+});
+app.stage.addChild(container);
+
+const cellSize = 4; //TODO make dynamic
 
 const cols = Math.ceil(app.screen.width / cellSize);
 const rows = Math.ceil(app.screen.height / cellSize);
 
-console.log("Cols", cols);
-console.log("Rows", rows);
-
 const totalCells = cols * rows;
 
+console.log("Cols", cols);
+console.log("Rows", rows);
 console.log(`Total cells: ${totalCells}`);
 
 const head = new Int32Array(totalCells).fill(-1);
@@ -57,11 +66,11 @@ function checkCollision(b: number) {
 
 const balls: CircleGraphic[] = [];
 
-for (let i = 0; i < 30000; i++) {
-	const x = 80 + Math.random() * (app.screen.width - 100);
-	const y = 80 + Math.random() * (app.screen.height - 100);
-	const randomBall = new CircleGraphic(app, x, y, 1);
-	randomBall.velocity = new Vector2((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10);
+for (let i = 0; i < 64000; i++) {
+	const x = Math.random() * (app.screen.width);
+	const y = Math.random() * (app.screen.height);
+	const randomBall = new CircleGraphic(container, circleTex, x, y, 2);
+	randomBall.velocity = new Vector2((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100);
 	balls.push(randomBall);
 }
 
@@ -89,8 +98,10 @@ const walls: SquareGraphic[] = [wall1, wall2, wall3, wall4];
 
 let fpsTimer = 0;
 
+const W = app.screen.width;
+const H = app.screen.height;
+
 app.ticker.add((ticker) => {
-	
 	fpsTimer += ticker.deltaMS;
 	if (fpsTimer >= 1000) {
 		console.log(ticker.FPS | 0);
@@ -102,18 +113,13 @@ app.ticker.add((ticker) => {
 	for (const ball of balls) {
 		ball.update(dt);
 		ball.draw();
+		collideWorldBounds(ball, W, H);
 	}
 
 	rebuildGrid();
 
 	for (let i = 0; i < balls.length; i++) {
 		checkCollision(i);
-	}
-
-	for (const ball of balls) {
-		for (const wall of walls) {
-			resolveCircleSquareColision(ball, wall);
-		}
 	}
 
 	for (const wall of walls) {
