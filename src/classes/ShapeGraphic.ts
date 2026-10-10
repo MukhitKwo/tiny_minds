@@ -5,16 +5,21 @@ export class CircleGraphic extends CirclePhysics {
 
     gfx: Graphics;
 
+    color: number;
+    radius: number;
+
     constructor(app: Application, x: number = 0, y: number = 0, radius: number = 10) {
         super(x, y, radius);
-        this.gfx = new Graphics().circle(0, 0, radius).fill(0xE63946)
-        app.stage.addChild(this.gfx)
+
+        this.color = 0xE63946;
+        this.radius = radius;
+
+        this.gfx = new Graphics();
+        app.stage.addChild(this.gfx);
     }
 
-    // call every frame, e.g. from app.ticker
     draw() {
-        this.gfx.position.set(this.position.x, this.position.y)
-        
+        this.gfx.clear().circle(this.position.x, this.position.y, this.radius).fill(this.color);
     }
 }
 

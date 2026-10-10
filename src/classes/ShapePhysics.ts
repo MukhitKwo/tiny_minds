@@ -12,7 +12,7 @@ export class CirclePhysics {
 	constructor(
 		x: number,
 		y: number,
-		radius: number,
+		radius: number = 1,
 		mass: number = 1,
 		velocity: Vector2 = new Vector2(0, 0),
 		bounce: number = 1,
