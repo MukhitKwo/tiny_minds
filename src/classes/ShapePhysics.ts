@@ -7,15 +7,15 @@ export class CirclePhysics {
 	mass: number;
 	bounce: number;
 	invMass: number = 1;
-	decay: number = 0.99
+	decay: number = 0
 
 	constructor(
 		x: number,
 		y: number,
-		radius: number = 1,
+		radius: number,
 		mass: number = 1,
 		velocity: Vector2 = new Vector2(0, 0),
-		bounce: number = 0.7,
+		bounce: number = 1,
 	) {
 		this.position = new Vector2(x, y);
 		this.radius = radius;
@@ -50,7 +50,7 @@ export class SquarePhysics {
 	invMass: number = 0;
 	static: boolean = true;
 
-	constructor(x: number, y: number, width: number = 1, height: number = 1, mass: number = 1, bounce: number = 0.9) {
+	constructor(x: number, y: number, width: number = 1, height: number = 1, mass: number = 1, bounce: number = 1) {
 		this.position = new Vector2(x, y);
 		this.width = width;
 		this.height = height;

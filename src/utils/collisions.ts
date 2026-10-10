@@ -10,7 +10,7 @@ export function resolveCircleCircleCollision(circle1: CirclePhysics, circle2: Ci
 	const dx = circle2.position.x - circle1.position.x;
 	const dy = circle2.position.y - circle1.position.y;
 
-	const distSq = dx ** 2 + dy ** 2 + 1e-8;
+	const distSq = dx ** 2 + dy ** 2;
 
 	const minDist = circle1.radius + circle2.radius;
 
@@ -18,9 +18,7 @@ export function resolveCircleCircleCollision(circle1: CirclePhysics, circle2: Ci
 		return null;
 	}
 
-	console.log("ball to ball collision");
-
-	const dist = Math.sqrt(distSq);
+	const dist = Math.sqrt(distSq) + 1e-8;
 
 	const overlap = minDist - dist;
 
@@ -62,9 +60,7 @@ export function resolveCircleSquareColision(circle: CirclePhysics, wall: SquareP
 	const distSq = dx ** 2 + dy ** 2;
 
 	if (distSq < radius ** 2) {
-		console.log("ball to wall colision");
-
-		const dist = Math.sqrt(distSq);
+		const dist = Math.sqrt(distSq) + 1e-8;
 
 		const overlap = radius - dist;
 

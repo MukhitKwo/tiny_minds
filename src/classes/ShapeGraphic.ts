@@ -2,10 +2,12 @@ import { Application, Graphics } from 'pixi.js'
 import { CirclePhysics, SquarePhysics } from './ShapePhysics';
 
 export class CircleGraphic extends CirclePhysics {
-    gfx = new Graphics().circle(0, 0, 20).fill(0xE63946)
 
-    constructor(app: Application, x: number = 0, y: number = 0, radius: number = 20) {
+    gfx: Graphics;
+
+    constructor(app: Application, x: number = 0, y: number = 0, radius: number = 10) {
         super(x, y, radius);
+        this.gfx = new Graphics().circle(0, 0, radius).fill(0xE63946)
         app.stage.addChild(this.gfx)
     }
 
