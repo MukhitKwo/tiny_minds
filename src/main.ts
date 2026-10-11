@@ -32,7 +32,7 @@ console.log(`Total cells: ${totalCells}`);
 const head = new Int32Array(totalCells).fill(-1);
 const next = new Int32Array(1_000_000);
 
-const balls: CircleGraphic[] = createBalls(app, 30000);
+const balls: CircleGraphic[] = createBalls(app, 5000);
 const walls: SquareGraphic[] = createWalls(app);
 
 let fpsTimer = 0;

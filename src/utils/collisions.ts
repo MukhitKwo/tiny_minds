@@ -1,6 +1,5 @@
 import type { CirclePhysics } from "../classes/ShapePhysics";
 import { cols, invCell, rows } from "../main";
-import { tileOf } from "./tileof";
 
 export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: CirclePhysics) {
 	const dx = circle2.position.x - circle1.position.x;

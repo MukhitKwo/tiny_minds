@@ -19,7 +19,7 @@ export function createBalls(app: Application, count: number) {
 		const x = Math.random() * app.screen.width;
 		const y = Math.random() * app.screen.height;
 		const radius = Math.random() * 8 + 2;
-		const mass = 1;
+		const mass = radius * radius * Math.PI;
 		const randomBall = new CircleGraphic(container, circleTex, x, y, radius, mass);
 		randomBall.velocity = new Vector2((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100);
 		balls.push(randomBall);
