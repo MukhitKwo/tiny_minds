@@ -20,8 +20,7 @@ export const cellSize = 4; //TODO make dynamic
 
 export const cols = Math.ceil(app.screen.width / cellSize);
 export const rows = Math.ceil(app.screen.height / cellSize);
-
-const totalCells = cols * rows;
+export const totalCells = cols * rows;
 
 console.log("Cols", cols);
 console.log("Rows", rows);
@@ -53,7 +52,7 @@ app.ticker.add((ticker) => {
 	
 	for (let i = 0; i < balls.length; i++) {
 		collideWorldBounds(balls[i], app.screen.width, app.screen.height);
-		checkCollision(i, balls, head, next, cols, rows);
+		checkCollision(i, balls, head, next);
 	}
 
 	for (const wall of walls) {

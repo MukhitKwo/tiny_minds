@@ -1,4 +1,5 @@
 import type { CirclePhysics } from "../classes/ShapePhysics";
+import { cols, rows } from "../main";
 import { tileOf } from "./tileof";
 
 export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: CirclePhysics) {
@@ -39,7 +40,7 @@ export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: 
 	circle2.velocity.y += j * normalY;
 }
 
-export function checkCollision(b: number, balls: CirclePhysics[], head: Int32Array, next: Int32Array, cols: number, rows: number) {
+export function checkCollision(b: number, balls: CirclePhysics[], head: Int32Array, next: Int32Array) {
 	const ball = balls[b];
 
 	const { cx, cy } = tileOf(ball);
