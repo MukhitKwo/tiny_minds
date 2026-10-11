@@ -18,7 +18,7 @@ document.body.appendChild(app.canvas);
 
 const amount = 2 ** 16
 
-export const cellSize = 4;
+export const cellSize = 10;
 export const invCell = 1 / cellSize;
 
 export const cols = Math.ceil(app.screen.width / cellSize);
@@ -32,7 +32,7 @@ console.log(`Total cells: ${totalCells}`);
 const head = new Int32Array(totalCells).fill(-1);
 const next = new Int32Array(1_000_000);
 
-const balls: CircleGraphic[] = createBalls(app, 65536);
+const balls: CircleGraphic[] = createBalls(app, 30000);
 const walls: SquareGraphic[] = createWalls(app);
 
 let fpsTimer = 0;
