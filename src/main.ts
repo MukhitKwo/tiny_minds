@@ -1,8 +1,9 @@
-import { CircleGraphic, SquareGraphic } from "./classes/ShapeGraphic";
-import { Vector2 } from "./classes/Vector2";
 import "./style.css";
-import { collideWorldBounds, resolveCircleCircleCollision } from "./utils/collisions";
-import { Application, Graphics, ParticleContainer } from "pixi.js";
+import { CircleGraphic, SquareGraphic } from "./classes/ShapeGraphic";
+import { checkCollision, collideWorldBounds } from "./utils/collisions";
+import { Application } from "pixi.js";
+import { createBalls, createWalls } from "./utils/create";
+import { rebuildGrid } from "./utils/grid";
 
 const app = new Application();
 await app.init({
@@ -15,19 +16,10 @@ await app.init({
 
 document.body.appendChild(app.canvas);
 
-const circleTex = app.renderer.generateTexture(
-	new Graphics().circle(0, 0, 32 / 2).fill(0xffffff), // white, so tint works
-);
+export const cellSize = 4; //TODO make dynamic
 
-const container = new ParticleContainer({
-	dynamicProperties: { position: true, vertex: true, color: true },
-});
-app.stage.addChild(container);
-
-const cellSize = 4; //TODO make dynamic
-
-const cols = Math.ceil(app.screen.width / cellSize);
-const rows = Math.ceil(app.screen.height / cellSize);
+export const cols = Math.ceil(app.screen.width / cellSize);
+export const rows = Math.ceil(app.screen.height / cellSize);
 
 const totalCells = cols * rows;
 
@@ -38,68 +30,10 @@ console.log(`Total cells: ${totalCells}`);
 const head = new Int32Array(totalCells).fill(-1);
 const next = new Int32Array(1_000_000);
 
-function tileOf(ball: CircleGraphic) {
-	const cx = Math.min(Math.max((ball.position.x / cellSize) | 0, 0), cols - 1);
-	const cy = Math.min(Math.max((ball.position.y / cellSize) | 0, 0), rows - 1);
-	return { cx, cy };
-}
-
-function checkCollision(b: number) {
-	const ball = balls[b];
-
-	const { cx, cy } = tileOf(ball);
-
-	for (let ny = Math.max(cy - 1, 0); ny <= Math.min(cy + 1, rows - 1); ny++) {
-		for (let nx = Math.max(cx - 1, 0); nx <= Math.min(cx + 1, cols - 1); nx++) {
-			const t = ny * cols + nx;
-
-			for (let j = head[t]; j !== -1; j = next[j]) {
-				const other = balls[j];
-
-				if (j <= b) continue;
-
-				resolveCircleCircleCollision(ball, other);
-			}
-		}
-	}
-}
-
-const balls: CircleGraphic[] = [];
-
-for (let i = 0; i < 64000; i++) {
-	const x = Math.random() * (app.screen.width);
-	const y = Math.random() * (app.screen.height);
-	const randomBall = new CircleGraphic(container, circleTex, x, y, 2);
-	randomBall.velocity = new Vector2((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100);
-	balls.push(randomBall);
-}
-
-function rebuildGrid() {
-	head.fill(-1);
-	balls.forEach((ball, index) => {
-		const { cx, cy } = tileOf(ball);
-
-		const gridPosition = cy * cols + cx;
-
-		// get the current head value at the grid position and store it in next[ball_index
-		next[index] = head[gridPosition];
-
-		// update the head to have the index of ball and next
-		head[gridPosition] = index;
-	});
-}
-
-const wall1 = new SquareGraphic(app, -20, 0, 20, app.screen.height);
-const wall2 = new SquareGraphic(app, 0, -20, app.screen.width, 20);
-const wall3 = new SquareGraphic(app, app.screen.width, 0, 20, app.screen.height);
-const wall4 = new SquareGraphic(app, 0, app.screen.height, app.screen.width, 20);
-
-const walls: SquareGraphic[] = [wall1, wall2, wall3, wall4];
+const balls: CircleGraphic[] = createBalls(app, 64000);
+const walls: SquareGraphic[] = createWalls(app);
 
 let fpsTimer = 0;
-
-const W = app.screen.width;
-const H = app.screen.height;
 
 app.ticker.add((ticker) => {
 	fpsTimer += ticker.deltaMS;
@@ -113,13 +47,13 @@ app.ticker.add((ticker) => {
 	for (const ball of balls) {
 		ball.update(dt);
 		ball.draw();
-		collideWorldBounds(ball, W, H);
 	}
-
-	rebuildGrid();
-
+	
+	rebuildGrid(head, balls, next, cols);
+	
 	for (let i = 0; i < balls.length; i++) {
-		checkCollision(i);
+		collideWorldBounds(balls[i], app.screen.width, app.screen.height);
+		checkCollision(i, balls, head, next, cols, rows);
 	}
 
 	for (const wall of walls) {

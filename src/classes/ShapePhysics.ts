@@ -32,21 +32,9 @@ export class CirclePhysics {
 			this.velocity = new Vector2(0, 0);
 		}
 
-		// this.velocity = this.velocity.add(new Vector2(0, 1000 * dt));
+		// this.velocity = this.velocity.add(new Vector2(0, 100 * dt));
 
 		// 2. Move position
 		this.position = this.position.add(this.velocity.scale(dt));
-	}
-}
-
-export class SquarePhysics {
-	position: Vector2;
-	width: number;
-	height: number;
-
-	constructor(x: number, y: number, width: number = 1, height: number = 1) {
-		this.position = new Vector2(x, y);
-		this.width = width;
-		this.height = height;
 	}
 }

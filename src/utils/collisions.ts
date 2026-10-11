@@ -1,6 +1,7 @@
-import type { CirclePhysics, SquarePhysics } from "../classes/ShapePhysics";
+import type { CirclePhysics } from "../classes/ShapePhysics";
+import { tileOf } from "./tileof";
 
-export function resolveCircleCircleCollision(circle1: CirclePhysics, circle2: CirclePhysics) {
+export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: CirclePhysics) {
 	const dx = circle2.position.x - circle1.position.x;
 	const dy = circle2.position.y - circle1.position.y;
 
@@ -16,7 +17,6 @@ export function resolveCircleCircleCollision(circle1: CirclePhysics, circle2: Ci
 	const normalX = dx / dist;
 	const normalY = dy / dist;
 
-	// Each circle moves half the overlap
 	const push = (minDist - dist) * 0.5;
 
 	circle1.position.x -= normalX * push;
@@ -39,60 +39,51 @@ export function resolveCircleCircleCollision(circle1: CirclePhysics, circle2: Ci
 	circle2.velocity.y += j * normalY;
 }
 
-export function resolveCircleSquareColision(circle: CirclePhysics, wall: SquarePhysics) {
-	const radius = circle.radius;
-
-	// returns either left side x, right side x, or circle position x
-	const px = Math.max(wall.position.x, Math.min(circle.position.x, wall.position.x + wall.width));
-	const py = Math.max(wall.position.y, Math.min(circle.position.y, wall.position.y + wall.height));
-
-	// if px is the circle x, it will return 0
-	const dx = circle.position.x - px;
-	const dy = circle.position.y - py;
-
-	// 0 ** 2 is 0, so it ignores it
-	const distSq = dx * dx + dy * dy;
-
-	if (distSq < radius ** 2) {
-		const dist = Math.sqrt(distSq) + 1e-8;
-
-		const overlap = radius - dist;
-
-		const normalX = dx / dist;
-		const normalY = dy / dist;
-
-		circle.position.x += normalX * overlap;
-		circle.position.y += normalY * overlap;
-
-		const velAlongN = circle.velocity.x * normalX + circle.velocity.y * normalY;
-
-		if (velAlongN > 0) {
-			return;
+export function checkCollision(b: number, balls: CirclePhysics[], head: Int32Array, next: Int32Array, cols: number, rows: number) {
+	const ball = balls[b];
+	
+	const { cx, cy } = tileOf(ball);
+	
+	for (let ny = Math.max(cy - 1, 0); ny <= Math.min(cy + 1, rows - 1); ny++) {
+		for (let nx = Math.max(cx - 1, 0); nx <= Math.min(cx + 1, cols - 1); nx++) {
+			const t = ny * cols + nx;
+			
+			for (let j = head[t]; j !== -1; j = next[j]) {
+				const other = balls[j];
+				
+				if (j <= b) continue;
+				
+				resolveCircleToCircleCollision(ball, other);
+			}
 		}
-
-		const j = -(1 + circle.bounce) * velAlongN;
-
-		circle.velocity.x += j * normalX;
-		circle.velocity.y += j * normalY;
 	}
+	
 }
 
 export function collideWorldBounds(c: CirclePhysics, W: number, H: number) {
 	const r = c.radius;
-
-	if (c.position.x < r) {
-		c.position.x = r;
-		if (c.velocity.x < 0) c.velocity.x *= -c.bounce;
-	} else if (c.position.x > W - r) {
-		c.position.x = W - r;
-		if (c.velocity.x > 0) c.velocity.x *= -c.bounce;
-	}
-
-	if (c.position.y < r) {
-		c.position.y = r;
-		if (c.velocity.y < 0) c.velocity.y *= -c.bounce;
-	} else if (c.position.y > H - r) {
-		c.position.y = H - r;
-		if (c.velocity.y > 0) c.velocity.y *= -c.bounce;
-	}
+	
+		if (c.position.x < r) {
+			c.position.x = r;
+			if (c.velocity.x < 0) {
+				c.velocity.x *= -c.bounce;
+			}
+		} else if (c.position.x > W - r) {
+			c.position.x = W - r;
+			if (c.velocity.x > 0) {
+				c.velocity.x *= -c.bounce;
+			}
+		}
+	
+		if (c.position.y < r) {
+			c.position.y = r;
+			if (c.velocity.y < 0) {
+				c.velocity.y *= -c.bounce;
+			}
+		} else if (c.position.y > H - r) {
+			c.position.y = H - r;
+			if (c.velocity.y > 0) {
+				c.velocity.y *= -c.bounce;
+			}
+		}
 }

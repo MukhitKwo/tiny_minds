@@ -1,5 +1,6 @@
 import { Application, Graphics, Particle, ParticleContainer, Texture } from 'pixi.js'
-import { CirclePhysics, SquarePhysics } from './ShapePhysics';
+import { CirclePhysics } from './ShapePhysics';
+import { Vector2 } from './Vector2';
 
 const TEX_SIZE = 32; // width of the shared circle texture
 
@@ -53,11 +54,19 @@ export class CircleGraphic extends CirclePhysics {
     }
 }
 
-export class SquareGraphic extends SquarePhysics {
-    gfx = new Graphics().rect(0, 0, this.width, this.height).fill(0x1F4FA8)
+export class SquareGraphic {
+
+    position: Vector2;
+	width: number;
+	height: number;
+
+    gfx: Graphics;
 
     constructor(app: Application, x: number = 0, y: number = 0, width: number = 1, height: number = 1) {
-        super(x, y, width, height);
+        this.position = new Vector2(x, y);
+		this.width = width;
+		this.height = height;
+        this.gfx = new Graphics().rect(0, 0, width, height).fill(0x1F4FA8)
         app.stage.addChild(this.gfx)
     }
 
