@@ -39,7 +39,7 @@ app.ticker.add((ticker) => {
 	fpsTimer += ticker.deltaMS;
 	if (fpsTimer >= 1000) {
 		console.log(ticker.FPS | 0);
-		fpsTimer -= 1000;
+		fpsTimer = 0;
 	}
 
 	const dt = Math.min(ticker.deltaMS / 1000, 1 / 30);
