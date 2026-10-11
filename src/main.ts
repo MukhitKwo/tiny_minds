@@ -16,7 +16,10 @@ await app.init({
 
 document.body.appendChild(app.canvas);
 
-export const cellSize = 4; //TODO make dynamic
+const amount = 2 ** 16
+
+export const cellSize = 4;
+export const invCell = 1 / cellSize;
 
 export const cols = Math.ceil(app.screen.width / cellSize);
 export const rows = Math.ceil(app.screen.height / cellSize);
@@ -29,7 +32,7 @@ console.log(`Total cells: ${totalCells}`);
 const head = new Int32Array(totalCells).fill(-1);
 const next = new Int32Array(1_000_000);
 
-const balls: CircleGraphic[] = createBalls(app, 4000);
+const balls: CircleGraphic[] = createBalls(app, 65536);
 const walls: SquareGraphic[] = createWalls(app);
 
 let fpsTimer = 0;
@@ -48,7 +51,7 @@ app.ticker.add((ticker) => {
 		ball.draw();
 	}
 	
-	rebuildGrid(head, balls, next, cols);
+	rebuildGrid(head, balls, next);
 	
 	for (let i = 0; i < balls.length; i++) {
 		collideWorldBounds(balls[i], app.screen.width, app.screen.height);

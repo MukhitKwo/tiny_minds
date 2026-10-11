@@ -1,5 +1,5 @@
 import type { CirclePhysics } from "../classes/ShapePhysics";
-import { cols, rows } from "../main";
+import { cols, invCell, rows } from "../main";
 import { tileOf } from "./tileof";
 
 export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: CirclePhysics) {
@@ -49,17 +49,33 @@ export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: 
 
 export function checkCircleCollision(b: number, balls: CirclePhysics[], head: Int32Array, next: Int32Array) {
 	const ball = balls[b];
+	const r = ball.radius;
 
-	const { cx, cy } = tileOf(ball);
+	// inline cell math: no object, no modulo or division
+	let cx = (ball.position.x * invCell) | 0;
+	let cy = (ball.position.y * invCell) | 0;
+	if (cx < 0) cx = 0; else if (cx >= cols) cx = cols - 1;
+	if (cy < 0) cy = 0; else if (cy >= rows) cy = rows - 1;
 
-	for (let ny = Math.max(cy - 1, 0); ny <= Math.min(cy + 1, rows - 1); ny++) {
-		for (let nx = Math.max(cx - 1, 0); nx <= Math.min(cx + 1, cols - 1); nx++) {
-			const t = ny * cols + nx;
+	const range = Math.ceil(r * 2 * invCell - 1e-9);
 
-			for (let j = head[t]; j !== -1; j = next[j]) {
+	// bounds computed once
+	const x0 = cx - range < 0 ? 0 : cx - range;
+	const x1 = cx + range >= cols ? cols - 1 : cx + range;
+	const y0 = cy - range < 0 ? 0 : cy - range;
+	const y1 = cy + range >= rows ? rows - 1 : cy + range;
+
+	for (let ny = y0; ny <= y1; ny++) {
+		const row = ny * cols;
+		for (let nx = x0; nx <= x1; nx++) {
+			for (let j = head[row + nx]; j !== -1; j = next[j]) {
+				if (j === b) continue;
+
 				const other = balls[j];
+				const or = other.radius;
 
-				if (j <= b) continue;
+				// bigger ball owns the pair, equal radius: lower index owns it
+				if (or > r || (or === r && j < b)) continue;
 
 				resolveCircleToCircleCollision(ball, other);
 			}

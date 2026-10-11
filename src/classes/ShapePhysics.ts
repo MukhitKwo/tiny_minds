@@ -14,7 +14,7 @@ export class CirclePhysics {
 		y: number,
 		radius: number,
 		mass: number,
-		bounce: number = 0.5,
+		bounce: number = 1,
 		velocity: Vector2 = new Vector2(0, 0),
 	) {
 		this.position = new Vector2(x, y);

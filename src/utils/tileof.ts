@@ -1,9 +1,19 @@
 import type { CircleGraphic } from "../classes/ShapeGraphic";
 import type { CirclePhysics } from "../classes/ShapePhysics";
-import { cellSize, cols, rows } from "../main";
+import { cols, invCell, rows } from "../main";
 
 export function tileOf(ball: CircleGraphic | CirclePhysics) {
-	const cx = Math.min(Math.max((ball.position.x / cellSize) | 0, 0), cols - 1);
-	const cy = Math.min(Math.max((ball.position.y / cellSize) | 0, 0), rows - 1);
-	return { cx, cy };
+	let cx = (ball.position.x * invCell) | 0;
+	let cy = (ball.position.y * invCell) | 0;
+	if (cx < 0) {
+		cx = 0;
+	} else if (cx >= cols) {
+		cx = cols - 1;
+	}
+	if (cy < 0) {
+		cy = 0;
+	} else if (cy >= rows) {
+		cy = rows - 1;
+	}
+	return cy * cols + cx;
 }
