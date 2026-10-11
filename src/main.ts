@@ -1,6 +1,6 @@
 import "./style.css";
 import { CircleGraphic, SquareGraphic } from "./classes/ShapeGraphic";
-import { checkCollision, collideWorldBounds } from "./utils/collisions";
+import { checkCircleCollision, collideWorldBounds } from "./utils/collisions";
 import { Application } from "pixi.js";
 import { createBalls, createWalls } from "./utils/create";
 import { rebuildGrid } from "./utils/grid";
@@ -29,7 +29,7 @@ console.log(`Total cells: ${totalCells}`);
 const head = new Int32Array(totalCells).fill(-1);
 const next = new Int32Array(1_000_000);
 
-const balls: CircleGraphic[] = createBalls(app, 64000);
+const balls: CircleGraphic[] = createBalls(app, 4000);
 const walls: SquareGraphic[] = createWalls(app);
 
 let fpsTimer = 0;
@@ -52,7 +52,7 @@ app.ticker.add((ticker) => {
 	
 	for (let i = 0; i < balls.length; i++) {
 		collideWorldBounds(balls[i], app.screen.width, app.screen.height);
-		checkCollision(i, balls, head, next);
+		checkCircleCollision(i, balls, head, next);
 	}
 
 	for (const wall of walls) {

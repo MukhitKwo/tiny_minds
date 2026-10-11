@@ -6,14 +6,15 @@ export class CirclePhysics {
 	velocity: Vector2;
 	mass: number;
 	bounce: number;
-	decay: number = 0
-
+	decay: number = 0;
+	invMass: number; 
+	
 	constructor(
 		x: number,
 		y: number,
-		radius: number = 1,
-		mass: number = 1,
-		bounce: number = 1,
+		radius: number,
+		mass: number,
+		bounce: number = 0.5,
 		velocity: Vector2 = new Vector2(0, 0),
 	) {
 		this.position = new Vector2(x, y);
@@ -21,20 +22,19 @@ export class CirclePhysics {
 		this.mass = mass;
 		this.bounce = bounce;
 		this.velocity = velocity;
+		this.invMass = 1 / this.mass;
 	}
 
 	update(dt: number) {
 		const frictionFactor = Math.exp(-this.decay * dt);
 		this.velocity = this.velocity.scale(frictionFactor);
 
-		// Optional: Stop tiny micro-jitters when velocity is virtually zero
 		if (this.velocity.magSq() < 0.01) {
 			this.velocity = new Vector2(0, 0);
 		}
 
 		// this.velocity = this.velocity.add(new Vector2(0, 100 * dt));
 
-		// 2. Move position
 		this.position = this.position.add(this.velocity.scale(dt));
 	}
 }

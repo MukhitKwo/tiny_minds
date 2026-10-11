@@ -32,15 +32,22 @@ export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: 
 	}
 
 	const e = Math.min(circle1.bounce, circle2.bounce);
-	const j = (-(1 + e) * velAlongN) / 2;
 
-	circle1.velocity.x -= j * normalX;
-	circle1.velocity.y -= j * normalY;
-	circle2.velocity.x += j * normalX;
-	circle2.velocity.y += j * normalY;
+	const im1 = circle1.invMass;
+	const im2 = circle2.invMass;
+
+	const j = (-(1 + e) * velAlongN) / (im1 + im2);
+
+	const jx = j * normalX;
+	const jy = j * normalY;
+
+	circle1.velocity.x -= jx * im1;
+	circle1.velocity.y -= jy * im1;
+	circle2.velocity.x += jx * im2;
+	circle2.velocity.y += jy * im2;
 }
 
-export function checkCollision(b: number, balls: CirclePhysics[], head: Int32Array, next: Int32Array) {
+export function checkCircleCollision(b: number, balls: CirclePhysics[], head: Int32Array, next: Int32Array) {
 	const ball = balls[b];
 
 	const { cx, cy } = tileOf(ball);

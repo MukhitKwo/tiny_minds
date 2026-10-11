@@ -12,8 +12,8 @@ export class CircleGraphic extends CirclePhysics {
     color: number;
     radius: number;
 
-    constructor(container: ParticleContainer, texture: Texture, x: number = 0, y: number = 0, radius: number = 10) {
-        super(x, y, radius);
+    constructor(container: ParticleContainer, texture: Texture, x: number = 0, y: number = 0, radius: number = 2, mass: number = 1) {
+        super(x, y, radius, mass);
 
         this.color = 0xE63946;
         this.radius = radius;
