@@ -6,21 +6,23 @@ export class CirclePhysics {
 	velocity: Vector2;
 	mass: number;
 	bounce: number;
-	decay: number = 0;
-	invMass: number; 
-	
+	decay: number;
+	invMass: number;
+
 	constructor(
 		x: number,
 		y: number,
-		radius: number,
-		mass: number,
-		bounce: number = 1,
+		radius: number = 5,
+		mass: number = 1,
+		bounce: number = 0.99,
+		decay: number = 0,
 		velocity: Vector2 = new Vector2(0, 0),
 	) {
 		this.position = new Vector2(x, y);
 		this.radius = radius;
 		this.mass = mass;
 		this.bounce = bounce;
+		this.decay = decay;
 		this.velocity = velocity;
 		this.invMass = 1 / this.mass;
 	}
