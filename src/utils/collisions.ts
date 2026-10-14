@@ -1,5 +1,5 @@
 import type { CirclePhysics } from "../classes/ShapePhysics";
-import { cols, invCell, rows } from "../main";
+import { cellSize, cols, invCell, rows } from "../main";
 import { state } from "./state";
 
 export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: CirclePhysics) {
@@ -19,8 +19,9 @@ export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: 
 	state.collisionCount++;
 
 	const dist = Math.sqrt(distSq) + 1e-8;
-	const normalX = dx / dist;
-	const normalY = dy / dist;
+	const inv = 1 / dist;
+	const normalX = dx * inv;
+	const normalY = dy * inv;
 
 	const push = (minDist - dist) * 0.5;
 
@@ -51,19 +52,18 @@ export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: 
 	circle2.velocity.y += jy * im2;
 }
 
-export function checkCircleCollision(b: number, balls: CirclePhysics[], head: Int32Array, next: Int32Array) {
+export function checkCircleCollision(b: number, balls: CirclePhysics[], head: Int32Array, next: Int32Array, rocks: Int32Array) {
 	const ball = balls[b];
 	const r = ball.radius;
 
-	// inline cell math: no object, no modulo or division
+	// which cell is the ball in
 	let cx = (ball.position.x * invCell) | 0;
 	let cy = (ball.position.y * invCell) | 0;
-	if (cx < 0) cx = 0; else if (cx >= cols) cx = cols - 1;
-	if (cy < 0) cy = 0; else if (cy >= rows) cy = rows - 1;
 
-	const range = Math.ceil(r * 2 * invCell - 1e-9);
+	// how far to search around that cell
+	const range = Math.ceil(r * 2 * invCell - 1e-6);
 
-	// bounds computed once
+	// define how far to search in the grid for potential collisions
 	const x0 = cx - range < 0 ? 0 : cx - range;
 	const x1 = cx + range >= cols ? cols - 1 : cx + range;
 	const y0 = cy - range < 0 ? 0 : cy - range;
@@ -72,15 +72,36 @@ export function checkCircleCollision(b: number, balls: CirclePhysics[], head: In
 	for (let ny = y0; ny <= y1; ny++) {
 		const row = ny * cols;
 		for (let nx = x0; nx <= x1; nx++) {
-			for (let j = head[row + nx]; j !== -1; j = next[j]) {
-				if (j === b) continue;
+			const cellIndex = row + nx;
 
+			for (let j = rocks[cellIndex]; j !== -1; j = next[j]) {
+				const rock = rocks[cellIndex];
+
+				if (rock === 1) {
+
+					state.detectionCount++;
+
+					const px = ball.position.x;
+					const py = ball.position.y;
+					const left = nx * cellSize;
+					const top = ny * cellSize;
+					const qx = Math.max(left, Math.min(px, left + cellSize));
+					const qy = Math.max(top, Math.min(py, top + cellSize));
+					const dx = px - qx;
+					const dy = py - qy;
+					const touching = dx * dx + dy * dy < r * r;
+
+					if (touching) {
+						state.collisionCount++;
+					}
+				}
+			}
+
+			for (let j = head[cellIndex]; j !== -1; j = next[j]) {
+				if (j === b) continue;
 				const other = balls[j];
 				const or = other.radius;
-
-				// bigger ball owns the pair, equal radius: lower index owns it
 				if (or > r || (or === r && j < b)) continue;
-
 				resolveCircleToCircleCollision(ball, other);
 			}
 		}
@@ -114,4 +135,3 @@ export function collideWorldBounds(c: CirclePhysics, W: number, H: number) {
 		}
 	}
 }
-

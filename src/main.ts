@@ -1,7 +1,7 @@
 import "./style.css";
 import { CircleGraphic } from "./classes/ShapeGraphic";
-import { checkCircleCollision, collideWorldBounds } from "./utils/collisions";
-import { Application, Container } from "pixi.js";
+import { checkCircleCollision as checkCollision, collideWorldBounds } from "./utils/collisions";
+import { Application, BufferImageSource, Container, Graphics, Sprite, Texture } from "pixi.js";
 import { createBalls } from "./utils/create";
 import { rebuildGrid } from "./utils/grid";
 import { createLabel } from "./utils/text";
@@ -35,8 +35,37 @@ console.log("Cols", cols);
 console.log("Rows", rows);
 console.log(`Total cells: ${totalCells}`);
 
-const head = new Int32Array(totalCells).fill(-1);
-const next = new Int32Array(1_000_000);
+const cellHead = new Int32Array(totalCells).fill(-1);
+const cellNext = new Int32Array(1_000_000);
+
+const rocks = new Int32Array(totalCells);
+for (let i = 0; i < rocks.length; i++) {
+	rocks[i] = Math.random() < 0.005 ? 1 : 0;
+}
+
+const pixels = new Uint8Array(totalCells * 4);
+for (let i = 0; i < totalCells; i++) {
+	if (rocks[i] === 1) {
+		const o = i * 4;
+		pixels[o] = 0x1f;
+		pixels[o + 1] = 0x4f;
+		pixels[o + 2] = 0xa8;
+		pixels[o + 3] = 255;
+	}
+}
+
+const source = new BufferImageSource({
+	resource: pixels,
+	width: cols,
+	height: rows,
+	format: "rgba8unorm",
+	scaleMode: "nearest",   // crisp squares when scaled up
+});
+
+const rockSprite = new Sprite(new Texture({ source }));
+rockSprite.scale.set(cellSize);
+rockSprite.eventMode = "none";
+world.addChild(rockSprite);   // add to world, not app.stage
 
 const balls: CircleGraphic[] = createBalls(app, world, 50000);
 
@@ -88,7 +117,6 @@ const detectionLabel = createLabel(app, 10, 30, 18, "Detections:");
 const collisionLabel = createLabel(app, 10, 50, 18, "Collisions:");
 
 app.ticker.add((ticker) => {
-
 	state.frames++;
 	fpsTimer += ticker.deltaMS;
 	if (fpsTimer >= 100) {
@@ -103,10 +131,10 @@ app.ticker.add((ticker) => {
 		ball.draw();
 	}
 
-	rebuildGrid(head, balls, next);
+	rebuildGrid(cellHead, balls, cellNext);
 
 	for (let i = 0; i < balls.length; i++) {
 		collideWorldBounds(balls[i], WORLD_W, WORLD_H);
-		checkCircleCollision(i, balls, head, next);
+		checkCollision(i, balls, cellHead, cellNext, rocks);
 	}
 });

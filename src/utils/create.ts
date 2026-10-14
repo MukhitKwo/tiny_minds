@@ -1,5 +1,5 @@
 import { Application, Container, Graphics, ParticleContainer } from "pixi.js";
-import { CircleGraphic, SquareGraphic } from "../classes/ShapeGraphic";
+import { CircleGraphic } from "../classes/ShapeGraphic";
 import { Vector2 } from "../classes/Vector2";
 import { randomRadius } from "./random";
 import { WORLD_W, WORLD_H } from "../main";
@@ -30,13 +30,13 @@ export function createBalls(app: Application, world: Container, count: number) {
 	return balls;
 }
 
-export function createWalls(app: Application) {
-	return [
-		new SquareGraphic(app, -20, 0, 20, app.screen.height),
-		new SquareGraphic(app, 0, -20, app.screen.width, 20),
-		new SquareGraphic(app, app.screen.width, 0, 20, app.screen.height),
-		new SquareGraphic(app, 0, app.screen.height, app.screen.width, 20),
-	];
-}
+// export function createWalls(app: Application) {
+// 	return [
+// 		new SquareGraphic(app, -20, 0, 20, app.screen.height),
+// 		new SquareGraphic(app, 0, -20, app.screen.width, 20),
+// 		new SquareGraphic(app, app.screen.width, 0, 20, app.screen.height),
+// 		new SquareGraphic(app, 0, app.screen.height, app.screen.width, 20),
+// 	];
+// }
 
 
