@@ -1,6 +1,7 @@
 import { Color } from "pixi.js";
 import type { CircleGraphic } from "../classes/ShapeGraphic";
 
+//TODO delete
 export function colorByDirection(i: number, balls: CircleGraphic[]) {
 	const ball = balls[i];
     

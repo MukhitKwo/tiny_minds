@@ -1,5 +1,6 @@
 import type { CirclePhysics } from "../classes/ShapePhysics";
 import { cols, invCell, rows } from "../main";
+import { state } from "./state";
 
 export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: CirclePhysics) {
 	const dx = circle2.position.x - circle1.position.x;
@@ -9,9 +10,13 @@ export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: 
 
 	const minDist = circle1.radius + circle2.radius;
 
+	state.detectionCount++;
+
 	if (distSq > minDist ** 2) {
 		return null;
 	}
+
+	state.collisionCount++;
 
 	const dist = Math.sqrt(distSq) + 1e-8;
 	const normalX = dx / dist;
@@ -109,3 +114,4 @@ export function collideWorldBounds(c: CirclePhysics, W: number, H: number) {
 		}
 	}
 }
+

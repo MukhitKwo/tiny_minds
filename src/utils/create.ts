@@ -2,6 +2,7 @@ import { Application, Container, Graphics, ParticleContainer } from "pixi.js";
 import { CircleGraphic, SquareGraphic } from "../classes/ShapeGraphic";
 import { Vector2 } from "../classes/Vector2";
 import { randomRadius } from "./random";
+import { WORLD_W, WORLD_H } from "../main";
 
 export function createBalls(app: Application, world: Container, count: number) {
 
@@ -17,8 +18,8 @@ export function createBalls(app: Application, world: Container, count: number) {
 	const balls: CircleGraphic[] = [];
 
 	for (let i = 0; i < count; i++) {
-		const x = Math.random() * app.screen.width;
-		const y = Math.random() * app.screen.height;
+		const x = Math.random() * WORLD_W;
+		const y = Math.random() * WORLD_H;
 		const radius = randomRadius();
 		const mass = radius * radius * Math.PI;
 		const randomBall = new CircleGraphic(particles, circleTex, x, y, radius, mass);
