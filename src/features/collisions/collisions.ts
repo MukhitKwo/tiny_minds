@@ -1,7 +1,6 @@
 // Ball-to-ball and ball-to-rock collision detection and response, plus world bounds.
 
 import { CELL_SIZE } from "../../constants/cells";
-import { CELL_RANGE_EPSILON, CONTACT_PUSH_SHARE, DISTANCE_EPSILON } from "../../constants/collisions";
 import { state } from "../../shared/state";
 import type { CirclePhysics } from "../balls/circlePhysics";
 import { gridCols, gridRows, invCellSize } from "../cells/grid";
@@ -22,12 +21,12 @@ export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: 
 
 	state.collisionCount++;
 
-	const dist = Math.sqrt(distSq) + DISTANCE_EPSILON;
+	const dist = Math.sqrt(distSq) + 1e-8;
 	const inv = 1 / dist;
 	const normalX = dx * inv;
 	const normalY = dy * inv;
 
-	const push = (minDist - dist) * CONTACT_PUSH_SHARE;
+	const push = (minDist - dist) * 0.5;
 
 	circle1.position.x -= normalX * push;
 	circle1.position.y -= normalY * push;
@@ -65,7 +64,7 @@ export function checkCircleCollision(b: number, balls: CirclePhysics[], head: In
 	let cy = (ball.position.y * invCellSize) | 0;
 
 	// how far to search around that cell
-	const range = Math.ceil(r * 2 * invCellSize - CELL_RANGE_EPSILON);
+	const range = Math.ceil(r * 2 * invCellSize - 1e-8);
 
 	// define how far to search in the grid for potential collisions
 	const x0 = cx - range < 0 ? 0 : cx - range;
