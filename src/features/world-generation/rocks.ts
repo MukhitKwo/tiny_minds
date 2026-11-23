@@ -9,7 +9,7 @@ import {
 	ROCK_PROBABILITY,
 	ROCK_RED,
 } from "../../constants/world-generation";
-import { gridCols, gridRows, totalCells } from "../cells/grid";
+import { gridCols, gridRows, totalCells } from "./grid";
 
 export function generateRocks() {
 	// TODO IMPROVEMENT: rocks holds only 0/1 flags; Uint8Array would cut this array's memory by 4x.

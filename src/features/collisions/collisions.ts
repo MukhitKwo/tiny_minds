@@ -3,7 +3,7 @@
 import { CELL_SIZE } from "../../constants/cells";
 import { state } from "../../shared/state";
 import type { CirclePhysics } from "../balls/circlePhysics";
-import { gridCols, gridRows, invCellSize } from "../cells/grid";
+import { gridCols, gridRows, invCellSize } from "../world-generation/grid";
 
 export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: CirclePhysics) {
 	const dx = circle2.position.x - circle1.position.x;
@@ -77,30 +77,6 @@ export function checkCircleCollision(b: number, balls: CirclePhysics[], head: In
 		for (let nx = x0; nx <= x1; nx++) {
 			const cellIndex = row + nx;
 
-			// TODO BUG: the loop starts from the rock flag (0 or 1) and walks the ball chain via next[], so rock checks repeat per chain entry and inflate detection/collision counts.
-			for (let j = rocks[cellIndex]; j !== -1; j = next[j]) {
-				const rock = rocks[cellIndex];
-
-				if (rock === 1) {
-
-					state.detectionCount++;
-
-					const px = ball.position.x;
-					const py = ball.position.y;
-					const left = nx * CELL_SIZE;
-					const top = ny * CELL_SIZE;
-					const qx = Math.max(left, Math.min(px, left + CELL_SIZE));
-					const qy = Math.max(top, Math.min(py, top + CELL_SIZE));
-					const dx = px - qx;
-					const dy = py - qy;
-					const touching = dx * dx + dy * dy < r * r;
-
-					if (touching) {
-						state.collisionCount++;
-					}
-				}
-			}
-
 			for (let j = head[cellIndex]; j !== -1; j = next[j]) {
 				if (j === b) continue;
 				const other = balls[j];
@@ -108,6 +84,30 @@ export function checkCircleCollision(b: number, balls: CirclePhysics[], head: In
 				if (or > r || (or === r && j < b)) continue;
 				resolveCircleToCircleCollision(ball, other);
 			}
+
+			// TODO BUG: the loop starts from the rock flag (0 or 1) and walks the ball chain via next[], so rock checks repeat per chain entry and inflate detection/collision counts.
+			// for (let j = rocks[cellIndex]; j !== -1; j = next[j]) {
+			// 	const rock = rocks[cellIndex];
+
+			// 	if (rock === 1) {
+
+			// 		state.detectionCount++;
+
+			// 		const px = ball.position.x;
+			// 		const py = ball.position.y;
+			// 		const left = nx * CELL_SIZE;
+			// 		const top = ny * CELL_SIZE;
+			// 		const qx = Math.max(left, Math.min(px, left + CELL_SIZE));
+			// 		const qy = Math.max(top, Math.min(py, top + CELL_SIZE));
+			// 		const dx = px - qx;
+			// 		const dy = py - qy;
+			// 		const touching = dx * dx + dy * dy < r * r;
+
+			// 		if (touching) {
+			// 			state.collisionCount++;
+			// 		}
+			// 	}
+			// }
 		}
 	}
 }

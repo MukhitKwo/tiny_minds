@@ -4,19 +4,12 @@ import "./style.css";
 import { Application, Container } from "pixi.js";
 import { BACKGROUND_COLOR } from "./constants/app";
 import { BALL_COUNT, MAX_SIMULATION_STEP } from "./constants/balls";
-import {
-	COLLISION_LABEL_Y,
-	DETECTION_LABEL_Y,
-	FPS_LABEL_Y,
-	HUD_FONT_SIZE,
-	HUD_LABEL_X,
-	HUD_UPDATE_INTERVAL_MS,
-} from "./constants/hud";
+import {COLLISION_LABEL_Y, DETECTION_LABEL_Y, FPS_LABEL_Y, HUD_FONT_SIZE, HUD_LABEL_X, HUD_UPDATE_INTERVAL_MS} from "./constants/hud";
 import { WORLD_H, WORLD_W } from "./constants/world-generation";
 import { createBalls } from "./features/balls/createBalls";
 import { checkCircleCollision, collideWorldBounds } from "./features/collisions/collisions";
 import { setupPanZoom } from "./features/camera/panZoom";
-import { cellHead, cellNext, gridCols, gridRows, rebuildGrid, totalCells } from "./features/cells/grid";
+import { cellHead, cellNext, gridCols, gridRows, rebuildGrid, totalCells } from "./features/world-generation/grid";
 import { createLabel, updateLabels } from "./features/hud/labels";
 import { addRockLayer, generateRocks } from "./features/world-generation/rocks";
 import { state } from "./shared/state";
