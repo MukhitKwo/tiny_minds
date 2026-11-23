@@ -1,6 +1,10 @@
-import type { CirclePhysics } from "../classes/ShapePhysics";
-import { cellSize, cols, invCell, rows } from "../main";
-import { state } from "./state";
+// Ball-to-ball and ball-to-rock collision detection and response, plus world bounds.
+
+import { CELL_SIZE } from "../../constants/cells";
+import { CELL_RANGE_EPSILON, CONTACT_PUSH_SHARE, DISTANCE_EPSILON } from "../../constants/collisions";
+import { state } from "../../shared/state";
+import type { CirclePhysics } from "../balls/circlePhysics";
+import { gridCols, gridRows, invCellSize } from "../cells/grid";
 
 export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: CirclePhysics) {
 	const dx = circle2.position.x - circle1.position.x;
@@ -18,12 +22,12 @@ export function resolveCircleToCircleCollision(circle1: CirclePhysics, circle2: 
 
 	state.collisionCount++;
 
-	const dist = Math.sqrt(distSq) + 1e-8;
+	const dist = Math.sqrt(distSq) + DISTANCE_EPSILON;
 	const inv = 1 / dist;
 	const normalX = dx * inv;
 	const normalY = dy * inv;
 
-	const push = (minDist - dist) * 0.5;
+	const push = (minDist - dist) * CONTACT_PUSH_SHARE;
 
 	circle1.position.x -= normalX * push;
 	circle1.position.y -= normalY * push;
@@ -57,23 +61,24 @@ export function checkCircleCollision(b: number, balls: CirclePhysics[], head: In
 	const r = ball.radius;
 
 	// which cell is the ball in
-	let cx = (ball.position.x * invCell) | 0;
-	let cy = (ball.position.y * invCell) | 0;
+	let cx = (ball.position.x * invCellSize) | 0;
+	let cy = (ball.position.y * invCellSize) | 0;
 
 	// how far to search around that cell
-	const range = Math.ceil(r * 2 * invCell - 1e-6);
+	const range = Math.ceil(r * 2 * invCellSize - CELL_RANGE_EPSILON);
 
 	// define how far to search in the grid for potential collisions
 	const x0 = cx - range < 0 ? 0 : cx - range;
-	const x1 = cx + range >= cols ? cols - 1 : cx + range;
+	const x1 = cx + range >= gridCols ? gridCols - 1 : cx + range;
 	const y0 = cy - range < 0 ? 0 : cy - range;
-	const y1 = cy + range >= rows ? rows - 1 : cy + range;
+	const y1 = cy + range >= gridRows ? gridRows - 1 : cy + range;
 
 	for (let ny = y0; ny <= y1; ny++) {
-		const row = ny * cols;
+		const row = ny * gridCols;
 		for (let nx = x0; nx <= x1; nx++) {
 			const cellIndex = row + nx;
 
+			// TODO BUG: the loop starts from the rock flag (0 or 1) and walks the ball chain via next[], so rock checks repeat per chain entry and inflate detection/collision counts.
 			for (let j = rocks[cellIndex]; j !== -1; j = next[j]) {
 				const rock = rocks[cellIndex];
 
@@ -83,10 +88,10 @@ export function checkCircleCollision(b: number, balls: CirclePhysics[], head: In
 
 					const px = ball.position.x;
 					const py = ball.position.y;
-					const left = nx * cellSize;
-					const top = ny * cellSize;
-					const qx = Math.max(left, Math.min(px, left + cellSize));
-					const qy = Math.max(top, Math.min(py, top + cellSize));
+					const left = nx * CELL_SIZE;
+					const top = ny * CELL_SIZE;
+					const qx = Math.max(left, Math.min(px, left + CELL_SIZE));
+					const qy = Math.max(top, Math.min(py, top + CELL_SIZE));
 					const dx = px - qx;
 					const dy = py - qy;
 					const touching = dx * dx + dy * dy < r * r;

@@ -1,3 +1,5 @@
+// Small 2D vector used for ball positions and velocities.
+
 export class Vector2 {
 	x: number;
 	y: number;

@@ -1,4 +1,13 @@
-import { Vector2 } from "./Vector2";
+// Physics state for a ball: position, velocity, mass, and per-tick motion.
+
+import {
+	BALL_SLEEP_SPEED_SQ,
+	PHYSICS_DEFAULT_BOUNCE,
+	PHYSICS_DEFAULT_DECAY,
+	PHYSICS_DEFAULT_MASS,
+	PHYSICS_DEFAULT_RADIUS,
+} from "../../constants/balls";
+import { Vector2 } from "../../shared/vector2";
 
 export class CirclePhysics {
 	position: Vector2;
@@ -12,10 +21,10 @@ export class CirclePhysics {
 	constructor(
 		x: number,
 		y: number,
-		radius: number = 5,
-		mass: number = 1,
-		bounce: number = 0.99,
-		decay: number = 0,
+		radius: number = PHYSICS_DEFAULT_RADIUS,
+		mass: number = PHYSICS_DEFAULT_MASS,
+		bounce: number = PHYSICS_DEFAULT_BOUNCE,
+		decay: number = PHYSICS_DEFAULT_DECAY,
 		velocity: Vector2 = new Vector2(0, 0),
 	) {
 		this.position = new Vector2(x, y);
@@ -27,15 +36,14 @@ export class CirclePhysics {
 		this.invMass = 1 / this.mass;
 	}
 
+	// TODO IMPROVEMENT: allocates new Vector2 objects for every ball on every tick; updating x/y in place would remove that GC pressure in the hot loop.
 	update(dt: number) {
 		const frictionFactor = Math.exp(-this.decay * dt);
 		this.velocity = this.velocity.scale(frictionFactor);
 
-		if (this.velocity.magSq() < 0.01) {
+		if (this.velocity.magSq() < BALL_SLEEP_SPEED_SQ) {
 			this.velocity = new Vector2(0, 0);
 		}
-
-		// this.velocity = this.velocity.add(new Vector2(0, 100 * dt));
 
 		this.position = this.position.add(this.velocity.scale(dt));
 	}
