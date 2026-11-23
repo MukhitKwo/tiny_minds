@@ -74,3 +74,4 @@ app.ticker.add((ticker) => {
 		checkCircleCollision(i, balls, cellHead, cellNext, rocks);
 	}
 });
+
